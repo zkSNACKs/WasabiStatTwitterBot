@@ -13,6 +13,7 @@ namespace TwitterBot
 		internal static FileLogger Logger;
 
 		private static CcjRunningRoundState previousState;
+		private static bool CanTweet = true;
 
 		static async Task Main(string[] args)
 		{
@@ -58,6 +59,8 @@ namespace TwitterBot
 
 					try
 					{
+						if(!CanTweet) return;
+
 						ExceptionHandler.SwallowWebExceptions = false;
 						Auth.SetUserCredentials(
 							Config.Get<string>("Consumer-Key"), 
@@ -75,6 +78,11 @@ namespace TwitterBot
 						{
 							Logger.Error($"Tweet was not published!!!");
 						}
+						
+						CanTweet = false;
+						Worker.QueueOneTime("Do not tweet the same twice",
+							()=>CanTweet=true, 
+							TimeSpan.FromSeconds(60));
 					}
 					catch(Exception e)
 					{
