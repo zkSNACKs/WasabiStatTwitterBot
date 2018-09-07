@@ -99,7 +99,7 @@ namespace TwitterBot
 
 		private static bool IsNewStateImportant(CcjRunningRoundState state)
 		{
-			return state.RegisteredPeerCount != state.RequiredPeerCount;
+			return state.RegisteredPeerCount == state.RequiredPeerCount;
 		}
 	}
 }
