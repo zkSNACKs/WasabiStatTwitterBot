@@ -33,7 +33,7 @@ namespace TwitterBot
 
 			Worker = new TimedWorker();
 			Worker.QueueForever("Check Coinjoin round status and tweet about it",
-				async()=>await CheckCoinJoinRoundStatusAsync(), 
+				CheckCoinJoinRoundStatus, 
 				TimeSpan.FromSeconds(Config.Get<int>("Time-Interval")));
 			Worker.Start();
 
@@ -42,13 +42,13 @@ namespace TwitterBot
 			Logger.Info("Wasabi TwitterBot finished.");
 		}
 
-		static async Task CheckCoinJoinRoundStatusAsync()
+		static void CheckCoinJoinRoundStatus()
 		{
 			try
 			{
 				var wasabiApiEndpoint = Config.Get<string>("Wasabi-URL");
 				var satoshiClient = new SatoshiClient(new Uri(wasabiApiEndpoint));
-				var states = await satoshiClient.GetAllRoundStatesAsync();
+				var states = satoshiClient.GetAllRoundStatesAsync().GetAwaiter().GetResult();
 				var state = states.First();
 
 				Logger.Info("Checking coinjoin round status");
