@@ -39,7 +39,11 @@ namespace TwitterBot
 						timeToWait = TimeSpan.FromMilliseconds(-1);
 					}
 
-					if (_resetEvent.WaitOne(timeToWait, false)) continue;
+					if(timeToWait != TimeSpan.Zero)
+					{
+						if (_resetEvent.WaitOne(timeToWait, false)) 
+							continue;
+					}
 
 					scheduledAction.Execute();
 
