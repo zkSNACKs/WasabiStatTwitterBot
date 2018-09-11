@@ -15,16 +15,15 @@ namespace TwitterBot
 
 		public T Get<T>(string key)
 		{
-			if(_values.TryGetValue(key, out var value))
+			var value = Environment.GetEnvironmentVariable(key);
+			if(string.IsNullOrEmpty(value))
 			{
-				return (T)Convert.ChangeType(value, typeof(T));
-			} 
-			return default(T);
-		}
-
-		public void SaveToile(string path)
-		{
-			File.WriteAllLines(path, _values.Select((key,value)=>$"{key}={value}").ToArray());
+				if(!_values.TryGetValue(key, out value))
+				{
+					return default(T);
+				}
+			}
+			return (T)Convert.ChangeType(value, typeof(T));
 		}
 
 		public static Config LoadFromFile(string path)

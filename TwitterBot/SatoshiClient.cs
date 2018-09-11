@@ -23,7 +23,7 @@ namespace TwitterBot
 
 		public async Task<IEnumerable<CcjRunningRoundState>> GetAllRoundStatesAsync()
 		{
-			var apiVersion = Bot.Config.Get<string>("Api-Version") ?? "2";
+			var apiVersion = Bot.Config.Get<string>("WASABI_BOT_API_VERSION") ?? "2";
 			var requestUri = new Uri(BaseUri,  $"/api/v{apiVersion}/btc/chaumiancoinjoin/states/");
 
 			using (var httpClient = new HttpClient(new SocksPortHandler(TorSocks5EndPoint)))

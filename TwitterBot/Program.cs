@@ -15,10 +15,10 @@ namespace TwitterBot
 		private static CcjRunningRoundState previousState;
 		private static bool CanTweet = true;
 
-		static async Task Main(string[] args)
+		static void Main(string[] args)
 		{
 			Config = Config.LoadFromFile("Config.ini");
- 			Logger = new FileLogger(Config.Get<string>("Log-File-Path") ?? "twitterbot.log");
+ 			Logger = new FileLogger(Config.Get<string>("WASABI_BOT_LOG_FILE_PATH") ?? "twitterbot.log");
 			Logger.Info("Wasabi TwitterBot starting");
 
 			var exitEvent = new AutoResetEvent(false);
@@ -31,10 +31,13 @@ namespace TwitterBot
 				exitEvent.Set();
 			};
 
+			var timeIntervalInSeconds = Config.Get<int>("WASABI_BOT_TIME_INTERVAL");
+			Logger.Info($"Checking interval setted to {timeIntervalInSeconds} seconds");
+
 			Worker = new TimedWorker();
 			Worker.QueueForever("Check Coinjoin round status and tweet about it",
 				CheckCoinJoinRoundStatus, 
-				TimeSpan.FromSeconds(Config.Get<int>("Time-Interval")));
+				TimeSpan.FromSeconds(timeIntervalInSeconds));
 			Worker.Start();
 
 			exitEvent.WaitOne();
@@ -46,7 +49,7 @@ namespace TwitterBot
 		{
 			try
 			{
-				var wasabiApiEndpoint = Config.Get<string>("Wasabi-URL");
+				var wasabiApiEndpoint = Config.Get<string>("WASABI_BOT_WASABI_URL");
 				var satoshiClient = new SatoshiClient(new Uri(wasabiApiEndpoint));
 				var states = satoshiClient.GetAllRoundStatesAsync().GetAwaiter().GetResult();
 				var state = states.First();
@@ -54,7 +57,7 @@ namespace TwitterBot
 				Logger.Info("Checking coinjoin round status");
 				if(IsNewStateImportant(state))
 				{
-					var tweetContent = $"@WasabiWallet's just helped another {state.RegisteredPeerCount} people improve their financial privacy. {Config.Get<string>("Tags")}";
+					var tweetContent = $"@WasabiWallet's just helped another {state.RegisteredPeerCount} people improve their financial privacy. {Config.Get<string>("WASABI_BOT_TAGS")}";
 					Logger.Info($"Tweeting: {tweetContent}");
 
 					try
@@ -63,10 +66,10 @@ namespace TwitterBot
 
 						ExceptionHandler.SwallowWebExceptions = false;
 						Auth.SetUserCredentials(
-							Config.Get<string>("Consumer-Key"), 
-							Config.Get<string>("Consumer-Secret"), 
-							Config.Get<string>("User-Access-Token"), 
-							Config.Get<string>("User-Access-Secret"));
+							Config.Get<string>("WASABI_BOT_TWITTER_CONSUMER_KEY"), 
+							Config.Get<string>("WASABI_BOT_TWITTER_CONSUMER_SECRET"), 
+							Config.Get<string>("WASABI_BOT_TWITTER_USER_ACCESS_TOKEN"), 
+							Config.Get<string>("WASABI_BOT_TWITTER_USER_ACCESS_SECRET"));
 						
 						var tweet = Tweet.PublishTweet(tweetContent);
 						
