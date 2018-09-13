@@ -23,7 +23,7 @@ namespace TwitterBot
 
 		public FileLogger(string filePath) {
 			this._filePath = filePath;
-			this.MinLevel = LogLevel.Information;			
+			this.MinLevel = LogLevel.Information;
 		}
 
 		public bool IsEnabled(LogLevel logLevel) {

@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using DotNetTor.SocksPort;
 using Newtonsoft.Json;
 
 namespace TwitterBot
@@ -13,12 +12,10 @@ namespace TwitterBot
 	public class SatoshiClient
 	{
 		public Uri BaseUri { get; }
-		public IPEndPoint TorSocks5EndPoint { get; }
 
 		public SatoshiClient(Uri baseUri, IPEndPoint torSocks5EndPoint = null)
 		{
 			BaseUri = baseUri;
-			TorSocks5EndPoint = torSocks5EndPoint ?? new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9050);
 		}
 
 		public async Task<IEnumerable<CcjRunningRoundState>> GetAllRoundStatesAsync()
@@ -26,7 +23,7 @@ namespace TwitterBot
 			var apiVersion = Bot.Config.Get<string>("WASABI_BOT_API_VERSION") ?? "2";
 			var requestUri = new Uri(BaseUri,  $"/api/v{apiVersion}/btc/chaumiancoinjoin/states/");
 
-			using (var httpClient = new HttpClient(new SocksPortHandler(TorSocks5EndPoint)))
+			using (var httpClient = new HttpClient())
 			{
 				using(var response = await httpClient.GetAsync(requestUri))
 				{
