@@ -5,10 +5,19 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <PublishDir>./out</PublishDir>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="TweetinviAPI" Version="4.0.0" />
   </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Target Name="_AfterPublish" AfterTargets="_CopyResolvedFilesToPublishAlways">
+    <Message Text="Deleteing incorrect .exe files" Importance="high"></Message>
+    <RemoveDir Directories="bin" />  
+    <RemoveDir Directories="obj" />  
+  </Target>
+
 </Project>
